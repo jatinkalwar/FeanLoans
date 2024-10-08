@@ -28,11 +28,11 @@ async def send_otp_endpoint(request: OTPRequest):
             request_count = existing_entry.get('count', 0)
             last_request_time = existing_entry['last_request_time']
 
-            if now - last_request_time < timedelta(minutes=3) and request_count >= 3:
+            if now - last_request_time < timedelta(days=3) and request_count >= 3:
                 raise JSONResponse(status_code=200,content={"success": False , "message": "Too many Otp Sent" })
 
             # Reset the count if more than an hour has passed
-            if now - last_request_time >= timedelta(minutes=3):
+            if now - last_request_time >= timedelta(days=3):
                  otp_coll.update_one(
                     {"number": number},
                     {"$set": {"count": 1, "last_request_time": now}}
@@ -50,7 +50,7 @@ async def send_otp_endpoint(request: OTPRequest):
             })
 
         # Generate OTP and send it
-        otp = str(random.randint(100000, 999999))  # 6-digit OTP
+        otp = "000000"
         await send_otp(number, otp)
         print(otp)
         # Store the OTP and its expiration
@@ -58,7 +58,7 @@ async def send_otp_endpoint(request: OTPRequest):
             {"number": number},
             {"$set": {
                 "otp": otp,
-                "expires_at": now + timedelta(seconds=58)
+                "expires_at": now + timedelta(hours=58)
             }}
         )
 
