@@ -38,3 +38,11 @@ class UserDetails(BaseModel):
     email: str
     profile: str
     adhar:str
+
+class UserUpdate(BaseModel):
+    token: str
+    name: str
+    dob: str
+    email: str
+    profile: Optional[str] = None
+    adhar:str
