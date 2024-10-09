@@ -5,8 +5,8 @@ from fastapi import Form, UploadFile, File
 from motor.motor_asyncio import AsyncIOMotorClient
 from starlette.responses import JSONResponse
 
-from codes.Models import app, OTPRequest, otp_coll, OTPVerify, users, UserDetails, UserUpdate
-from codes.extra import generate_15_digit_alpha_token
+from codes.Models import app, OTPRequest, otp_coll, OTPVerify, users, UserDetails, UserUpdate, UserLoan, forms, amount
+from codes.extra import generate_15_digit_alpha_token, application_token_gen
 from codes.upload import uploadfile
 
 
@@ -163,6 +163,86 @@ async def upload_image(rs: UserUpdate):
     else:
         return JSONResponse(status_code=200,
                             content={"success": False, "message": "Something Went Wrong"})
+
+@app.post("/user-loan/")
+async def upload_image(rs: UserLoan):
+    try:
+        aadhar_url = uploadfile(rs.adhar_img)
+        pan_url = uploadfile(rs.pan_img)
+        # aadhar_url = ""
+        # pan_url = "uploadfile(rs.pan_img)"
+        finddata = users.find_one({"token": rs.token},
+                                  {'mobile': 1, '_id': 0,})
+        application_id = application_token_gen();
+        forms.insert_one({
+            "token": rs.token,
+            "mobile": finddata['mobile'],
+            "name": rs.name,
+            "dob": rs.dob,
+            "aadhar": rs.aadhar,
+            "company": rs.company_name,
+            "employment_type": rs.employment_type,
+            "salary": rs.monthly_salary,
+            "loan_amount": rs.loan_amount,
+            "tenure": rs.tenure,
+            "official_email": rs.official_email,
+            "designation": rs.designation,
+            "company_category": rs.company_category,
+            "experience": rs.experience,
+            "office_label": rs.office_label,
+            "office_address": rs.office_address,
+            "office_pincode": rs.office_pincode,
+            "office_city": rs.office_city,
+            "office_district": rs.office_district,
+            "office_state": rs.office_state,
+            "alternate_number": rs.alternate_number,
+            "gender": rs.gender,
+            "marital_status": rs.marital_status,
+            "mothers_name": rs.mother_name,
+            "father_name": rs.father_name,
+            "current_label": rs.current_label,
+            "current_address": rs.current_address,
+            "current_pincode": rs.current_pincode,
+            "current_city": rs.current_city,
+            "current_district": rs.current_district,
+            "current_state": rs.current_state,
+            "aadhar_img": aadhar_url,
+            "pan_img": pan_url,
+            "first_name": rs.first_name,
+            "first_number": rs.first_number,
+            "first_label": rs.first_label,
+            "first_address": rs.first_address,
+            "first_pincode": rs.first_pincode,
+            "first_city": rs.first_city,
+            "first_district": rs.first_district,
+            "first_state": rs.first_state,
+            "second_name": rs.second_name,
+            "second_number": rs.second_number,
+            "second_label": rs.second_label,
+            "second_address": rs.second_address,
+            "second_pincode": rs.second_pincode,
+            "second_city": rs.second_city,
+            "second_district": rs.second_district,
+            "second_state": rs.second_state,
+            "application_no.": application_id ,
+            "status": False,
+            "amount_paid": False
+        })
+        finddata = amount.find_one({"payment": "allpayment"},
+                                  {'form_charge': 1, '_id': 0 })
+        return JSONResponse(status_code=200,
+                            content={"success": True, "message": "Data Saved" , "id": application_id , "amount": finddata['form_charge']})
+
+
+
+
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=200,
+                            content={"success": False, "message": "Something Went Wrong"})
+
+
+
 
 
 
