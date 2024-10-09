@@ -18,11 +18,7 @@ def uploadfile(filee):
         # Open the file as a file-like object
         # Reset file pointer in case it was read before
         # Or 'utf-8' depending on the encoding
-        with open("uploaded_new_sp.png", "rb") as image_file:
-            # Read the image file as bytes
-            image_data = image_file.read()
-            # Encode bytes to Base64
-            base64_image = base64.b64encode(image_data).decode('utf-8')
+
 
         upload = imagekit.upload(
             file=f"data:image/jpeg;base64,{filee}",  # Use the file stream
@@ -40,3 +36,44 @@ def uploadfile(filee):
         print(f"Error uploading file: {str(e)}")
         return "fail"
 
+
+def imagev(image_data):
+    try:
+        print(image_data)
+        # split_data = image_data.split(",", 1)
+        # base64_encoded_image = split_data[1]
+        decoded_data = base64.b64decode(image_data)
+
+    except Exception as e:
+        print(f"Error decoding Base64 string: {e}")
+        exit()
+
+    # Load the image from the decoded data
+    try:
+        image = Image.open(BytesIO(decoded_data))
+
+    except Exception as e:
+        print(f"Error loading image from decoded data: {e}")
+        exit()
+
+    # Convert image to RGB mode if it has an alpha channel (RGBA)
+    if image.mode == 'RGBA':
+        image = image.convert('RGB')
+
+    # Save the decoded image as a JPEG file
+    initial_output_file_path = "initial_output_image.jpg"
+    try:
+        image.save(initial_output_file_path, format="JPEG")
+    except Exception as e:
+        print(f"Error saving image: {e}")
+        exit()
+
+    # Now, open the saved JPEG file and compress it
+    compressed_output_file_path = f"com.jpg"
+    try:
+        image.save(compressed_output_file_path, format="JPEG", quality=60)
+
+
+    except Exception as e:
+        print(f"Error compressing and saving image:  {e}")
+        exit()
