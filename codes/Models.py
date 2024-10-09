@@ -37,3 +37,4 @@ class UserDetails(BaseModel):
     dob: str
     email: str
     profile: str
+    adhar:str
