@@ -5,7 +5,7 @@ from fastapi import Form, UploadFile, File
 from motor.motor_asyncio import AsyncIOMotorClient
 from starlette.responses import JSONResponse
 
-from codes.Models import app, OTPRequest, otp_coll, OTPVerify, users, UserDetails
+from codes.Models import app, OTPRequest, otp_coll, OTPVerify, users, UserDetails, UserUpdate
 from codes.extra import generate_15_digit_alpha_token
 from codes.upload import uploadfile
 
@@ -137,7 +137,7 @@ async def upload_image(rs: UserDetails):
 
 
 @app.post("/user-update/")
-async def upload_image(rs: UserDetails):
+async def upload_image(rs: UserUpdate):
     name = rs.name
     file = rs.profile
     dob = rs.dob
@@ -149,6 +149,13 @@ async def upload_image(rs: UserDetails):
     # You can save the file or process it here (this is an example of saving it)
     # with open(f"uploaded_{file_content}", "wb") as f:
     #     f.write(file_content)
+    if file is None:
+        users.update_one({"token": token}, {"$set": {"name": name, "dob": dob, "email": email}})
+        finddata = users.find_one({"token": token},
+                                  {'name': 1, '_id': 0, 'token': 1, "email": 1, "dob": 1, "profile": 1, "aadhar": 1})
+        return JSONResponse(status_code=200,
+                            content={"success": True, "message": "Profile Saved successfully.", "name": name,
+                                     "dob": dob, "email": email, "profile": finddata["profile"], "aadhar": adhar})
     res =  uploadfile(file)
     if res != "fail":
         users.update_one({"token": token}, {"$set": {"name": name, "dob": dob , "email":email , "profile": res }})
