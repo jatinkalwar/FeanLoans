@@ -96,10 +96,10 @@ async def verify_otp(request: OTPVerify):
 
     otp_coll.delete_one({"number": number})  # Remove OTP after successful verification
     finddata = users.find_one({"mobile": number},
-                                    {'name': 1,'_id': 0 , 'token':1})
+                                    {'name': 1,'_id': 0 , 'token':1 , "email": 1 , "dob": 1 , "profile": 1  , "aadhar": 1})
     if finddata:
         return JSONResponse(status_code=200,
-                            content={"success": True, "message": "OTP verified successfully.", "isfirst": False , "token": finddata["token"]})
+                            content={"success": True, "message": "OTP verified successfully.", "isfirst": False , "token": finddata["token"] , "email": finddata["email"]  , "name": finddata["name"] , "dob":finddata["dob"] , "profile": finddata["profile"] , "aadhar": finddata["aadhar"]})
     else:
         token = generate_15_digit_alpha_token()
         ih = users.find_one({"token": token},
@@ -110,7 +110,6 @@ async def verify_otp(request: OTPVerify):
             users.insert_one(
                 {"mobile": number, "name": "", "dob": "",
                  "token": token, "active": True, "aadhar": "", "email": "", "profile": "", "extra": ""})
-
             return JSONResponse(status_code=200, content={"success": True, "message": "OTP verified successfully." , "isfirst": True , "token": token})
 
 
@@ -119,8 +118,9 @@ async def upload_image(rs: UserDetails):
     name = rs.name
     file = rs.profile
     dob = rs.dob
-    email = rs.dob
+    email = rs.email
     token = rs.token
+    adhar = rs.adhar
   # Read the uploaded image file content
 
     # You can save the file or process it here (this is an example of saving it)
@@ -129,10 +129,35 @@ async def upload_image(rs: UserDetails):
     res =  uploadfile(file)
     if res != "fail":
         users.update_one({"token": token}, {"$set": {"name": name, "dob": dob , "email":email , "profile": res }})
-        return JSONResponse(status_code=200, content={"success": True, "message": "Profile Saved successfully." , "name":name , "dob": dob ,"email": email , "profile": res})
+        return JSONResponse(status_code=200, content={"success": True, "message": "Profile Saved successfully." , "name":name , "dob": dob ,"email": email , "profile": res , "aadhar": adhar})
     else:
         return JSONResponse(status_code=200,
-                            content={"success": False, "message": "Profile Saved successfully."})
+                            content={"success": False, "message": "Something Went Wrong"})
+
+
+
+@app.post("/user-update/")
+async def upload_image(rs: UserDetails):
+    name = rs.name
+    file = rs.profile
+    dob = rs.dob
+    email = rs.email
+    token = rs.token
+    adhar = rs.adhar
+  # Read the uploaded image file content
+
+    # You can save the file or process it here (this is an example of saving it)
+    # with open(f"uploaded_{file_content}", "wb") as f:
+    #     f.write(file_content)
+    res =  uploadfile(file)
+    if res != "fail":
+        users.update_one({"token": token}, {"$set": {"name": name, "dob": dob , "email":email , "profile": res }})
+        return JSONResponse(status_code=200, content={"success": True, "message": "Profile Saved successfully." , "name":name , "dob": dob ,"email": email , "profile": res , "aadhar": adhar})
+    else:
+        return JSONResponse(status_code=200,
+                            content={"success": False, "message": "Something Went Wrong"})
+
+
 
 
 
