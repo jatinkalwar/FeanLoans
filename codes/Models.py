@@ -18,6 +18,8 @@ app.add_middleware(
 client = MongoClient("mongodb+srv://jatinkalwar:shifaanam@mbomb.ghtntua.mongodb.net")
 users = client.msdigital.users
 otp_coll = client.msdigital.otp
+forms = client.msdigital.forms
+amount = client.msdigital.payment
 
 
 
@@ -46,3 +48,55 @@ class UserUpdate(BaseModel):
     email: str
     profile: Optional[str] = None
     adhar:str
+
+class UserLoan(BaseModel):
+    token: str
+    loan_type: str
+    name: str
+    dob: str
+    aadhar: str
+    company_name: str
+    employment_type: str
+    monthly_salary: str
+    loan_amount: str
+    tenure: str
+    official_email: str
+    designation: str
+    company_category: str
+    experience: str
+    office_label: str
+    office_address: str
+    office_pincode: str
+    office_city: str
+    office_district: str
+    office_state: str
+    alternate_number: str
+    gender: str
+    marital_status: str
+    mother_name: str
+    father_name: str
+    current_label: str
+    current_address: str
+    current_pincode: str
+    current_city: str
+    current_district: str
+    current_state: str
+    adhar_img: str
+    pan_img: str
+    first_name: str
+    first_number: str
+    first_label: str
+    first_address: str
+    first_pincode: str
+    first_city: str
+    first_district: str
+    first_state: str
+
+    second_name: str
+    second_number: str
+    second_label: str
+    second_address : str
+    second_pincode: str
+    second_city: str
+    second_district: str
+    second_state: str
