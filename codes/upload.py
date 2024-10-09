@@ -25,7 +25,7 @@ def uploadfile(filee):
             base64_image = base64.b64encode(image_data).decode('utf-8')
 
         upload = imagekit.upload(
-            file=f"data:image/jpeg;base64,{base64_image}",  # Use the file stream
+            file=f"data:image/jpeg;base64,{filee}",  # Use the file stream
             file_name="hjdgfh.jpg",  # Use the original file name
             options=UploadFileRequestOptions(
                 tags=["tag1", "tag2"]
