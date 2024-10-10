@@ -93,7 +93,7 @@ async def getinsurancelist(token):
                 "success": True,
                 "avail": False,
                 "message": "No Data Found",
-                "amount": finddata['agreement'],
+                "amount": finddata['insurance'],
                 "data": []
             })
 
@@ -101,7 +101,7 @@ async def getinsurancelist(token):
             "success": True,
             "message": "Data Found",
             "avail": True,
-            "amount": finddata['agreement'],
+            "amount": finddata['insurance'],
             "data": documents  # Return the modified documents
         })
     except Exception as e:
