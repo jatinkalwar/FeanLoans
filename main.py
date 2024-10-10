@@ -10,7 +10,7 @@ from codes.Models import app, OTPRequest, otp_coll, OTPVerify, users, UserDetail
     CreateOrder, GetStatus, GetApplication
 from codes.extra import generate_15_digit_alpha_token, application_token_gen, get_time
 from codes.upload import uploadfile
-from datas import getapplicationslist, getagreementlist
+from datas import getapplicationslist, getagreementlist, getinsurancelist
 
 
 async def send_otp(number: str, otp: str):
@@ -299,6 +299,18 @@ async def get_agreement(rs: GetApplication):
         print(e)
         return JSONResponse(status_code=200,
                             content={"success": False, "message": "Something Went Wrong"})
+
+@app.post("/get-insurance/")
+async def get_insurance(rs: GetApplication):
+    try:
+        return await getinsurancelist(rs.token)
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=200,
+                            content={"success": False, "message": "Something Went Wrong"})
+
+
+
 
 
 
