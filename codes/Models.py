@@ -109,3 +109,6 @@ class CreateOrder(BaseModel):
 
 class GetStatus(BaseModel):
     transaction: str
+
+class GetApplication(BaseModel):
+    token: str
