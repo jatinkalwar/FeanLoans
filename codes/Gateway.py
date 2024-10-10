@@ -1,6 +1,8 @@
 import time
 import datetime
 from urllib.parse import urlparse, parse_qs, unquote, quote
+
+import pytz
 import requests
 from bs4 import BeautifulSoup
 from starlette.responses import JSONResponse
@@ -19,12 +21,24 @@ async def createorder(applicationid , token , type):
             return JSONResponse(status_code=200,
                                 content={"success": False, "message": "No User Found"})
 
-        transaction_code = f"0706{transaction_token()}"
-        finddata = amount.find_one({"payment": "allpayment"},
-                                   {'form_charge': 1, '_id': 0})
+        transaction_code = f"{transaction_token()}"
+        finddata = amount.find_one({"payment": "formcharge"},
+                                   {'loan1_5': 1, '_id': 0 , 'loan6_15': 1 , 'loan16_25': 1 , 'loan26_50': 1 , 'loan51_100': 1})
+        amt = forms.find_one({"application_no": applicationid},
+                                   {'loan_amount': 1, '_id': 0,})
         global amounts
         if type=="1":
-            amounts = "1"
+            if int(amt['loan_amount']) < 500000:
+                amounts = finddata['loan1_5']
+            elif int(amt['loan_amount']) < 1500000:
+                amounts = finddata['loan6_15']
+            elif int(amt['loan_amount']) < 2500000:
+                amounts = finddata['loan16_25']
+            elif int(amt['loan_amount']) < 5000000:
+                amounts = finddata['loan26_50']
+            elif int(amt['loan_amount']) < 10000000:
+                amounts = finddata['loan51_100']
+
             # amounts =  finddata['form_charge']
         orderapi = await create_antipay(amounts , transaction_code , token)
         if orderapi["status"] is True:
@@ -63,8 +77,8 @@ async def getstatus(transaction):
 
             return JSONResponse(status_code=200, content={"success": False, "message": "mismatch"})
         elif sta == "success":
-            print(transaction)
-            gplink = transactiondb.find_one({"transaction_id": transaction},{'wallet_add': 1, 'paid': 1, '_id': 0 , 'amount': 1 , 'token': 1})
+
+            gplink = transactiondb.find_one({"transaction_id": transaction},{'wallet_add': 1, 'paid': 1, '_id': 0 , 'amount': 1 , 'application': 1})
 
             if gplink['wallet_add'] is False:
                 res = await getutr(transaction)
@@ -76,7 +90,8 @@ async def getstatus(transaction):
 
                         transactiondb.update_one({"transaction_id": transaction},
                                                {"$set": {"wallet_add": True , 'paid': True , 'utr':res['result']['utr'] ,  'complete_date': get_formatted_datetime() }})
-                        forms.update_one({"token": gplink['token']},
+
+                        forms.update_one({"application_no": gplink['application']},
                                               {"$set": {"amount_paid": True}})
                         # await sendnotification(gplink['deviceid'] , f"{res['result']['amount']}{MONEY_NOTIFICATION}" )
                         # await updatetransactionforus(gplink['deviceid'] , "Add Money Through Anitoolz Gateway" ,gplink['amount'] , "0"  , str(int(data['wallet']) + res['result']['amount']) , await genratetransactionid() )
@@ -152,12 +167,16 @@ async def create_antipay(wallet , transaction , token, ):
 
 
 def get_formatted_datetime():
-    now = datetime.datetime.now()
+    # Set timezone to IST (Indian Standard Time)
+    ist = pytz.timezone('Asia/Kolkata')
+
+    # Get current time in IST
+    now = datetime.datetime.now(ist)
+
+    # Format the datetime
     formatted_datetime = now.strftime("%d %B %Y %I:%M %p")
 
-
     return formatted_datetime
-
 
 async def payment_qr(url):
     new = url.replace("\\/", "/")
@@ -200,5 +219,4 @@ async def getdata(url):
         return decoded_data
     else:
         return False
-
 
