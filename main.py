@@ -7,9 +7,10 @@ from starlette.responses import JSONResponse
 
 from codes.Gateway import createorder, getstatus
 from codes.Models import app, OTPRequest, otp_coll, OTPVerify, users, UserDetails, UserUpdate, UserLoan, forms, amount, \
-    CreateOrder, GetStatus
+    CreateOrder, GetStatus, GetApplication
 from codes.extra import generate_15_digit_alpha_token, application_token_gen, get_time
 from codes.upload import uploadfile
+from datas import getapplicationslist, getagreementlist
 
 
 async def send_otp(number: str, otp: str):
@@ -175,7 +176,8 @@ async def upload_image(rs: UserLoan):
         # pan_url = "uploadfile(rs.pan_img)"
         finddata = users.find_one({"token": rs.token},
                                   {'mobile': 1, '_id': 0,})
-        application_id = application_token_gen();
+
+        application_id = application_token_gen()
         forms.insert_one({
             "token": rs.token,
             "mobile": finddata['mobile'],
@@ -226,15 +228,30 @@ async def upload_image(rs: UserLoan):
             "second_city": rs.second_city,
             "second_district": rs.second_district,
             "second_state": rs.second_state,
-            "application_no.": application_id ,
+            "application_no": application_id ,
             "status": False,
             "amount_paid": False,
+            "agreement_amount": False,
+            "insurance_amount": False,
             "fill_on": get_time()
         })
-        finddata = amount.find_one({"payment": "allpayment"},
-                                  {'form_charge': 1, '_id': 0 })
+        finddata = amount.find_one({"payment": "formcharge"},
+                                   {'loan1_5': 1, '_id': 0, 'loan6_15': 1, 'loan16_25': 1, 'loan26_50': 1,
+                                    'loan51_100': 1})
+
+        global amounts
+        if int(rs.loan_amount) < 500000:
+                amounts = finddata['loan1_5']
+        elif int(rs.loan_amount) < 1500000:
+                amounts = finddata['loan6_15']
+        elif int(rs.loan_amount) < 2500000:
+                amounts = finddata['loan16_25']
+        elif int(rs.loan_amount) < 5000000:
+                amounts = finddata['loan26_50']
+        elif int(rs.loan_amount) < 10000000:
+                amounts = finddata['loan51_100']
         return JSONResponse(status_code=200,
-                            content={"success": True, "message": "Data Saved" , "id": application_id , "amount": finddata['form_charge']})
+                            content={"success": True, "message": "Data Saved" , "id": application_id , "amount": amounts})
 
 
 
@@ -258,6 +275,25 @@ async def create_order(rs: CreateOrder):
 async def get_status(rs: GetStatus):
     try:
         return await getstatus(rs.transaction)
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=200,
+                            content={"success": False, "message": "Something Went Wrong"})
+
+
+@app.post("/get-application/")
+async def get_application(rs: GetApplication):
+    try:
+        return await getapplicationslist(rs.token)
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=200,
+                            content={"success": False, "message": "Something Went Wrong"})
+
+@app.post("/get-agreement/")
+async def get_agreement(rs: GetApplication):
+    try:
+        return await getagreementlist(rs.token)
     except Exception as e:
         print(e)
         return JSONResponse(status_code=200,
