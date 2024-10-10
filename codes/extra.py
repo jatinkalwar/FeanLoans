@@ -1,6 +1,10 @@
 import random
 import string
 from datetime import datetime
+
+import pytz
+
+
 def application_token_gen():
     return ''.join([str(random.randint(0, 9)) for _ in range(15)])
 
@@ -15,7 +19,9 @@ def generate_15_digit_alpha_token():
     return token
 
 def get_time():
-    now = datetime.now()
+    # Get the current time in the IST timezone
+    ist = pytz.timezone('Asia/Kolkata')
+    now = datetime.now(ist)
 
     # Format the date and time
-    return now.strftime("%d %B %Y %I:%M%p")
+    return now.strftime("%d %B %Y %I:%M %p")
