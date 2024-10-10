@@ -184,6 +184,7 @@ async def upload_image(rs: UserLoan):
             "name": rs.name,
             "dob": rs.dob,
             "aadhar": rs.aadhar,
+            "loan_type": rs.loan_type,
             "company": rs.company_name,
             "employment_type": rs.employment_type,
             "salary": rs.monthly_salary,
