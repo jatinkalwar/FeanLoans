@@ -20,6 +20,7 @@ users = client.msdigital.users
 otp_coll = client.msdigital.otp
 forms = client.msdigital.forms
 amount = client.msdigital.payment
+transactiondb = client.msdigital.transaction
 
 
 
@@ -100,3 +101,11 @@ class UserLoan(BaseModel):
     second_city: str
     second_district: str
     second_state: str
+
+class CreateOrder(BaseModel):
+    application: str
+    token: str
+    type: str
+
+class GetStatus(BaseModel):
+    transaction: str
