@@ -5,8 +5,10 @@ from fastapi import Form, UploadFile, File
 from motor.motor_asyncio import AsyncIOMotorClient
 from starlette.responses import JSONResponse
 
-from codes.Models import app, OTPRequest, otp_coll, OTPVerify, users, UserDetails, UserUpdate, UserLoan, forms, amount
-from codes.extra import generate_15_digit_alpha_token, application_token_gen
+from codes.Gateway import createorder, getstatus
+from codes.Models import app, OTPRequest, otp_coll, OTPVerify, users, UserDetails, UserUpdate, UserLoan, forms, amount, \
+    CreateOrder, GetStatus
+from codes.extra import generate_15_digit_alpha_token, application_token_gen, get_time
 from codes.upload import uploadfile
 
 
@@ -99,7 +101,7 @@ async def verify_otp(request: OTPVerify):
                                     {'name': 1,'_id': 0 , 'token':1 , "email": 1 , "dob": 1 , "profile": 1  , "aadhar": 1})
     if finddata:
         return JSONResponse(status_code=200,
-                            content={"success": True, "message": "OTP verified successfully.", "isfirst": False , "token": finddata["token"] , "email": finddata["email"]  , "name": finddata["name"] , "dob":finddata["dob"] , "profile": finddata["profile"] , "aadhar": finddata["aadhar"]})
+                            content={"success": True, "message": "OTP verified successfully.", "isfirst": False , "token": finddata["token"] , "email": finddata["email"]  , "name": finddata["name"] , "dob":finddata["dob"] , "profile": finddata["profile"] , "aadhar": finddata["aadhar"] , "create_date": get_time()})
     else:
         token = generate_15_digit_alpha_token()
         ih = users.find_one({"token": token},
@@ -226,7 +228,8 @@ async def upload_image(rs: UserLoan):
             "second_state": rs.second_state,
             "application_no.": application_id ,
             "status": False,
-            "amount_paid": False
+            "amount_paid": False,
+            "fill_on": get_time()
         })
         finddata = amount.find_one({"payment": "allpayment"},
                                   {'form_charge': 1, '_id': 0 })
@@ -241,7 +244,24 @@ async def upload_image(rs: UserLoan):
         return JSONResponse(status_code=200,
                             content={"success": False, "message": "Something Went Wrong"})
 
+@app.post("/create-order/")
+async def create_order(rs: CreateOrder):
+    try:
+        return await createorder(rs.application , rs.token , rs.type)
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=200,
+                            content={"success": False, "message": "Something Went Wrong"})
 
+
+@app.post("/get-status/")
+async def get_status(rs: GetStatus):
+    try:
+        return await getstatus(rs.transaction)
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=200,
+                            content={"success": False, "message": "Something Went Wrong"})
 
 
 
