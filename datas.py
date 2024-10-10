@@ -42,7 +42,7 @@ async def getagreementlist(token):
         # Convert cursor to a list of documents first
         documents = list(forms.find(
             {"token": token, "amount_paid": True ,"status": True},
-            {"fill_on": 1, "_id": 0 , 'application_no':1 , 'mobile':1 , 'name':1 , 'loan_amount':1 , 'agreement_amount':1 , "loan_type":1} ))
+            {"fill_on": 1, "_id": 0 , 'application_no':1 , 'mobile':1 , 'name':1 , 'loan_amount':1 , 'agreement_amount':1 , "loan_type":1 , "status":1} ))
 
         # Remove the _id field from each document
         for doc in documents:
