@@ -2,15 +2,14 @@ from datetime import datetime, timedelta
 from starlette.responses import JSONResponse
 from codes.Gateway import createorder, getstatus
 from codes.Models import app, OTPRequest, otp_coll, OTPVerify, users, UserDetails, UserUpdate, UserLoan, forms, amount, \
-    CreateOrder, GetStatus, GetApplication
+    CreateOrder, GetStatus, GetApplication, client, PutUpdate
 from codes.extra import generate_15_digit_alpha_token, application_token_gen, get_time, getotp, generate_otp
 from codes.upload import uploadfile
-from datas import getapplicationslist, getagreementlist, getinsurancelist
+from datas import getapplicationslist, getagreementlist, getinsurancelist, senduserdetail, putupdate, sendformsdetails
 
 
 async def send_otp(number: str, otp: str):
     print(f"Sending OTP {otp} to {number}")
-
 
 
 #####SEND OTP
@@ -309,6 +308,23 @@ async def get_insurance(rs: GetApplication):
         return JSONResponse(status_code=200,
                             content={"success": False, "message": "Something Went Wrong"})
 
+@app.post("/put-update/")
+async def put_update(rs: PutUpdate):
+    try:
+        return await putupdate(  rs.type , rs.status , rs.token)
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=200,
+                            content={"success": False, "message": "Something Went Wrong"})
+
+@app.get("/get-userdata/")
+async def getuser():
+    return await senduserdetail()
+
+
+@app.get("/get-formsdata/")
+async def formsdata():
+    return await sendformsdetails()
 
 
 
