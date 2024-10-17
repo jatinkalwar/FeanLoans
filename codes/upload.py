@@ -1,16 +1,13 @@
 import base64
 from PIL import Image
 from io import BytesIO
-
-from fastapi import UploadFile
 from imagekitio import ImageKit
 from imagekitio.models.UploadFileRequestOptions import UploadFileRequestOptions
-from starlette.responses import JSONResponse
 
 imagekit = ImageKit(
-    private_key='private_Ljx7dcaXUYlkgXTkEmRO0hXgga8=',
-    public_key='public_3qwqV6qN+2dieni1N+oxY2PDwM0=',
-    url_endpoint='https://ik.imagekit.io/Thirddb'
+    private_key='private_tQ3BFG6JIQKFqjpvAtP7VYdE4nQ=',
+    public_key='public_F9nbSyC0XF5BWcuXVVL6MIwqxxg=',
+    url_endpoint='https://ik.imagekit.io/feanloans'
 )
 
 def uploadfile(filee):
