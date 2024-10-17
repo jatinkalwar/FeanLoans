@@ -109,6 +109,11 @@ class CreateOrder(BaseModel):
     token: str
     type: str
 
+class PutUpdate(BaseModel):
+    token: str
+    status: bool
+    type: str
+
 class GetStatus(BaseModel):
     transaction: str
 
