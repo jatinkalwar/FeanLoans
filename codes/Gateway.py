@@ -30,15 +30,15 @@ async def createorder(applicationid, token, type):
                              {'loan_amount': 1, '_id': 0, })
         global amounts
         if type == "1":
-            if int(amt['loan_amount']) < 500000:
+            if int(amt['loan_amount']) <= 500000:
                 amounts = finddata['loan1_5']
-            elif int(amt['loan_amount']) < 1500000:
+            elif int(amt['loan_amount']) <= 1500000:
                 amounts = finddata['loan6_15']
-            elif int(amt['loan_amount']) < 2500000:
+            elif int(amt['loan_amount']) <= 2500000:
                 amounts = finddata['loan16_25']
-            elif int(amt['loan_amount']) < 5000000:
+            elif int(amt['loan_amount']) <= 5000000:
                 amounts = finddata['loan26_50']
-            elif int(amt['loan_amount']) < 10000000:
+            elif int(amt['loan_amount']) <= 10000000:
                 amounts = finddata['loan51_100']
         elif type == "2":
             finddata = amount.find_one({"payment": "file"},
