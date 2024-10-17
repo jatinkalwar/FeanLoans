@@ -15,7 +15,7 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
     allow_headers=["*"],  # Allows all headers
 )
-client = MongoClient("mongodb+srv://feanloans:*****@feanloans.tw0rt.mongodb.net")
+client = MongoClient("mongodb+srv://feanloans:feanloans@feanloans.tw0rt.mongodb.net")
 users = client.feans.users
 otp_coll = client.feans.otp
 forms = client.feans.forms
