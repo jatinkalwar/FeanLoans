@@ -1,10 +1,5 @@
 from datetime import datetime, timedelta
-import random
-
-from fastapi import Form, UploadFile, File
-from motor.motor_asyncio import AsyncIOMotorClient
 from starlette.responses import JSONResponse
-
 from codes.Gateway import createorder, getstatus
 from codes.Models import app, OTPRequest, otp_coll, OTPVerify, users, UserDetails, UserUpdate, UserLoan, forms, amount, \
     CreateOrder, GetStatus, GetApplication
@@ -14,8 +9,9 @@ from datas import getapplicationslist, getagreementlist, getinsurancelist
 
 
 async def send_otp(number: str, otp: str):
-
     print(f"Sending OTP {otp} to {number}")
+
+
 
 #####SEND OTP
 @app.post("/send-otp/")
@@ -102,11 +98,11 @@ async def verify_otp(request: OTPVerify):
 
     otp_coll.delete_one({"number": number})  # Remove OTP after successful verification
     finddata = users.find_one({"mobile": number},
-                                    {'name': 1,'_id': 0 , 'token':1 , "email": 1 , "dob": 1 , "profile": 1  , "aadhar": 1})
+                                    {'name': 1,'_id': 0 , 'token':1 , "email": 1 , "dob": 1 , "profile": 1  , "aadhar": 1 , "isfirst": 1})
 
     if finddata:
         return JSONResponse(status_code=200,
-                            content={"success": True, "message": "OTP verified successfully.", "isfirst": False , "token": finddata["token"] , "email": finddata["email"]  , "name": finddata["name"] , "dob":finddata["dob"] , "profile": finddata["profile"] , "aadhar": finddata["aadhar"] , "create_date": get_time()})
+                            content={"success": True, "message": "OTP verified successfully.", "isfirst": finddata['isfirst'] , "token": finddata["token"] , "email": finddata["email"]  , "name": finddata["name"] , "dob":finddata["dob"] , "profile": finddata["profile"] , "aadhar": finddata["aadhar"] , "create_date": get_time()})
     else:
         token = generate_15_digit_alpha_token()
         ih = users.find_one({"token": token},
@@ -117,7 +113,7 @@ async def verify_otp(request: OTPVerify):
         else:
             users.insert_one(
                 {"mobile": number, "name": "", "dob": "",
-                 "token": token, "active": True, "aadhar": "", "email": "", "profile": "", "extra": ""})
+                 "token": token, "active": True, "aadhar": "", "email": "", "profile": "", "extra": "" , "create_date": get_time() , "isfirst": True})
             return JSONResponse(status_code=200, content={"success": True, "message": "OTP verified successfully." , "isfirst": True , "token": token})
 
 
@@ -130,13 +126,12 @@ async def upload_image(rs: UserDetails):
     token = rs.token
     adhar = rs.adhar
   # Read the uploaded image file content
-
     # You can save the file or process it here (this is an example of saving it)
     # with open(f"uploaded_{file_content}", "wb") as f:
     #     f.write(file_content)
     res =  uploadfile(file)
     if res != "fail":
-        users.update_one({"token": token}, {"$set": {"name": name, "dob": dob , "email":email , "profile": res }})
+        users.update_one({"token": token}, {"$set": {"name": name, "dob": dob , "email":email , "profile": res , "aadhar": adhar , "isfirst": False}})
         return JSONResponse(status_code=200, content={"success": True, "message": "Profile Saved successfully." , "name":name , "dob": dob ,"email": email , "profile": res , "aadhar": adhar})
     else:
         return JSONResponse(status_code=200,
