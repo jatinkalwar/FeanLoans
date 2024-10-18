@@ -175,6 +175,31 @@ async def putupdate(type , status , token):
             "message": "Something Went Wrong"
         })
 
+async def sendamountdetails():
+    try:
+        gplink = amount.find_one({"payment": "formcharge"},
+                                {'loan16_25': 1, '_id': 0,'loan1_5': 1, 'loan26_50': 1,'loan51_100': 1, 'loan6_15': 1})
+        file = amount.find_one({"payment": "file"},
+                                 {'agreement': 1, '_id': 0, 'insurance': 1})
+        return JSONResponse(status_code=200, content={
+            "success": True,
+            "message": "Amount Fetched",
+            "agreement": file['agreement'],
+            "insurance": file['insurance'],
+            "loan1": gplink['loan1_5'],
+            "loan2": gplink['loan6_15'],
+            "loan3": gplink['loan16_25'],
+            "loan4": gplink['loan26_50'],
+            "loan5": gplink['loan51_100'],
+        })
+
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=200, content={
+            "success": False,
+            "message": "Something Went Wrong"
+        })
+
 async def sendformsdetails():
     try:
         documents = list(forms.find({},{
@@ -258,3 +283,19 @@ async def sendformsdetails():
             "message": "Something Went Wrong"
         })
 
+async def putloanamt(agreement , insurance , loan1 , loan2 , loan3 ,loan4 , loan5):
+    try:
+        amount.update_one({"payment": "file"},
+                         {"$set": {"agreement": agreement, "insurance": insurance }})
+
+        amount.update_one({"payment": "formcharge"},
+                         {"$set": {"loan1_5": loan1, "loan6_15": loan2 ,"loan16_25": loan3, "loan26_50": loan4 ,"loan51_100": loan5}})
+        return JSONResponse(status_code=200, content={
+            "success": True,
+            "message": "Update Successfully"
+        })
+    except Exception as e:
+        return JSONResponse(status_code=200, content={
+            "success": False,
+            "message": "Something Went Wrong"
+        })
