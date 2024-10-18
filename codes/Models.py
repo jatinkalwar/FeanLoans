@@ -114,6 +114,16 @@ class PutUpdate(BaseModel):
     status: bool
     type: str
 
+class PutAmount(BaseModel):
+    agreement: str
+    insurance: str
+    loan1: str
+    loan2: str
+    loan3: str
+    loan4: str
+    loan5: str
+
+
 class GetStatus(BaseModel):
     transaction: str
 
