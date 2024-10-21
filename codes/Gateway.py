@@ -27,19 +27,21 @@ async def createorder(applicationid, token, type):
                                    {'loan1_5': 1, '_id': 0, 'loan6_15': 1, 'loan16_25': 1, 'loan26_50': 1,
                                     'loan51_100': 1})
         amt = forms.find_one({"application_no": applicationid},
-                             {'loan_amount': 1, '_id': 0, })
+                             {'loan_amount': 1, '_id': 0, 'doc_amt': 1 })
         global amounts
         if type == "1":
-            if int(amt['loan_amount']) <= 500000:
-                amounts = finddata['loan1_5']
-            elif int(amt['loan_amount']) <= 1500000:
-                amounts = finddata['loan6_15']
-            elif int(amt['loan_amount']) <= 2500000:
-                amounts = finddata['loan16_25']
-            elif int(amt['loan_amount']) <= 5000000:
-                amounts = finddata['loan26_50']
-            elif int(amt['loan_amount']) <= 10000000:
-                amounts = finddata['loan51_100']
+            amounts = amt['doc_amt']
+
+            # if int(amt['loan_amount']) < 500000:
+            #     amounts = finddata['loan1_5']
+            # elif int(amt['loan_amount']) < 1500000:
+            #     amounts = finddata['loan6_15']
+            # elif int(amt['loan_amount']) < 2500000:
+            #     amounts = finddata['loan16_25']
+            # elif int(amt['loan_amount']) < 5000000:
+            #     amounts = finddata['loan26_50']
+            # elif int(amt['loan_amount']) <= 10000000:
+            #     amounts = finddata['loan51_100']
         elif type == "2":
             finddata = amount.find_one({"payment": "file"},
                                        {'agreement': 1, '_id': 0})
