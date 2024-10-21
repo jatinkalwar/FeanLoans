@@ -109,6 +109,11 @@ class CreateOrder(BaseModel):
     token: str
     type: str
 
+class UploadImage(BaseModel):
+    image: str
+    type: str
+    token: str
+
 class PutUpdate(BaseModel):
     token: str
     status: bool
