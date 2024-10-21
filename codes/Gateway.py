@@ -110,8 +110,10 @@ async def getstatus(transaction):
                                                            'utr': res['result']['utr'],
                                                            'complete_date': get_formatted_datetime()}})
                         if gplink['type'] == "1":
+                            # forms.update_one({"application_no": gplink['application']},
+                            #                  {"$set": {"amount_paid": True}})
                             forms.update_one({"application_no": gplink['application']},
-                                             {"$set": {"amount_paid": True}})
+                                             {"$set": {"amount_paid": True , "doc_charge":True}})
                         elif gplink["type"] == "2":
                             forms.update_one({"application_no": gplink['application']},
                                              {"$set": {"agreement_amount": True}})
