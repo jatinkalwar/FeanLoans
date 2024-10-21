@@ -241,6 +241,7 @@ async def upload_image(rs: UserLoan):
             "approved_tenure": "",
             "monthly_emi": "",
             "roi": "",
+            "doc_amt": "",
         })
         finddata = amount.find_one({"payment": "formcharge"},
                                    {'loan1_5': 1, '_id': 0, 'loan6_15': 1, 'loan16_25': 1, 'loan26_50': 1,
@@ -286,6 +287,8 @@ async def get_status(rs: GetStatus):
         print(e)
         return JSONResponse(status_code=200,
                             content={"success": False, "message": "Something Went Wrong"})
+
+
 
 
 
@@ -336,6 +339,12 @@ async def put_update(rs: PutUpdate):
 
 @app.get("/get-userdata/")
 async def getuser():
+    return await senduserdetail()
+
+@app.get("/get-docamt/")
+async def getdocamt():
+    finddata = amount.find_one({"payment": "file"},
+                               {'insurance': 1, '_id': 0})
     return await senduserdetail()
 
 
