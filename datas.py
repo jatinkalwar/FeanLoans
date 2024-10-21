@@ -43,7 +43,7 @@ async def getloanstatuslist(token):
         # Convert cursor to a list of documents first
         documents = list(forms.find(
             {"token": token , "doc_charge": False},
-            {"status": 1, "fill_on": 1, "_id": 0 , 'application_no':1 , 'mobile':1 , 'name':1 , 'loan_amount':1 , "loan_type": 1 , "doc_charge":1, "doc_status":1 ,  }  # Projecting only 'status' and 'time', excluding '_id'
+            {"status": 1, "fill_on": 1, "_id": 0 , 'application_no':1 , 'mobile':1 , 'name':1 , 'loan_amount':1 , "loan_type": 1 , "doc_charge":1, "doc_status":1 , "approved_amt":1,"approved_tenure":1 , "monthly_emi":1,"roi":1 ,"doc_amt":1 }  # Projecting only 'status' and 'time', excluding '_id'
         ))
 
         # Remove the _id field from each document
