@@ -6,7 +6,7 @@ from codes.Models import app, OTPRequest, otp_coll, OTPVerify, users, UserDetail
 from codes.extra import generate_15_digit_alpha_token, application_token_gen, get_time, getotp, generate_otp
 from codes.upload import uploadfile
 from datas import getapplicationslist, getagreementlist, getinsurancelist, senduserdetail, putupdate, sendformsdetails, \
-    sendamountdetails, putloanamt
+    sendamountdetails, putloanamt, getloanstatuslist
 
 
 async def send_otp(number: str, otp: str):
@@ -234,7 +234,13 @@ async def upload_image(rs: UserLoan):
             "amount_paid": False,
             "agreement_amount": False,
             "insurance_amount": False,
-            "fill_on": get_time()
+            "fill_on": get_time(),
+            "doc_charge": False,
+            "doc_status": False,
+            "approved_amt": "",
+            "approved_tenure": "",
+            "monthly_emi": "",
+            "roi": "",
         })
         finddata = amount.find_one({"payment": "formcharge"},
                                    {'loan1_5': 1, '_id': 0, 'loan6_15': 1, 'loan16_25': 1, 'loan26_50': 1,
@@ -281,6 +287,16 @@ async def get_status(rs: GetStatus):
         return JSONResponse(status_code=200,
                             content={"success": False, "message": "Something Went Wrong"})
 
+
+
+@app.post("/get-loanstatus/")
+async def get_loanstatus(rs: GetApplication):
+    try:
+        return await getloanstatuslist(rs.token)
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=200,
+                            content={"success": False, "message": "Something Went Wrong"})
 
 @app.post("/get-application/")
 async def get_application(rs: GetApplication):
