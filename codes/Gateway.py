@@ -10,7 +10,7 @@ from starlette.responses import JSONResponse
 from codes.Models import users, amount, transactiondb, forms
 from codes.extra import transaction_token
 
-USER_TOKEN = "40233d18631ba719fdc6abde15951ff7"
+USER_TOKEN = "994839198a4b6514dc9cc296c3bda19c"
 MONEY_NOTIFICATION = "rs added to your wallet successfully"
 
 
